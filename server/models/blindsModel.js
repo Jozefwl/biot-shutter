@@ -5,7 +5,9 @@ const blindsSchema = new mongoose.Schema({
     "updatedAt": { type: Number, required: true },
     "name": { type: String, required: true },
     "location": { type: String, required: true },
-    "motorPosition": { type: Number, required: true }
+    "motorPosition": { type: Number, required: true },
+    "daylightSensor": { type: Boolean, required: true },
+    "manualTimeSettings": { type: Boolean, required: true }
 });
 
-module.exports = mongoose.model("blinds", blindsSchema);
+module.exports = mongoose.model("Blind", blindsSchema);
