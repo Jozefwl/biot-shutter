@@ -7,4 +7,4 @@ const scheduledEventsSchema = new mongoose.Schema({
     "requiredMotorPosition": { type: Number, required: true }
 });
 
-module.exports = mongoose.model("scheduledEvents", scheduledEventsSchema);
+module.exports = mongoose.model("ScheduledEvent", scheduledEventsSchema);
