@@ -17,8 +17,8 @@ function App() {
       <h1 className="Header">Blinds control</h1>
        {data ? (
         <>
-          <Name name={data.name} id={data._id} fetchData={fetchData}/>
-          <Control />
+          <Name name={data.blindStatus.name} id={data.blindStatus._id} fetchData={fetchData}/>
+          <Control id={data.blindStatus._id} pos={data.blindStatus.motorPosition} fetchData={fetchData}/>
           <Settings />
         </>
        ):(
