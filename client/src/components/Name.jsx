@@ -5,7 +5,6 @@ import { mdiRename } from '@mdi/js';
 
 function Name(props) {
 
-    const [name, setName] = useState("Ložnice")
     const [newName, setNewName] = useState("");
 
     const [show, setShow] = useState(false);
@@ -18,14 +17,13 @@ function Name(props) {
     const handleShow = () => setShow(true);
 
     const handleRename = () => {
-        setName(newName)
         setNewName("")
         handleClose();   
     }
 
     return(
         <div className="Name">
-            <p>{name} <Button variant="outline-secondary" onClick={handleShow}><Icon path={mdiRename} size={1.7} /></Button></p>
+            <p>{props.name} <Button variant="outline-secondary" onClick={handleShow}><Icon path={mdiRename} size={1.7} /></Button></p>
 
             <Modal show={show} onHide={handleClose} backdrop="static" centered >
                 <Modal.Header closeButton>

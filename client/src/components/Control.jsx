@@ -5,7 +5,7 @@ import { mdiArrowDownThick, mdiArrowUpThick, mdiArrowUpDownBold, mdiWindowShutte
 
 function Control(props) {
 
-    const [opened, setOpened] = useState(true)
+    const [opened, setOpened] = useState(false)
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
