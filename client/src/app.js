@@ -6,6 +6,7 @@ import Control from "./components/Control"
 import Settings from "./components/Settings"
 import { useDataContext } from './DataContext';
 import Spinner from 'react-bootstrap/Spinner';
+import toast, { Toaster } from 'react-hot-toast';
 
 function App() {
 
@@ -16,14 +17,14 @@ function App() {
       <h1 className="Header">Blinds control</h1>
        {data ? (
         <>
-          <Name name={data.name}/>
+          <Name name={data.name} id={data._id} fetchData={fetchData}/>
           <Control />
           <Settings />
         </>
        ):(
         <Spinner animation="border" />
        )}
-      
+      <Toaster />
     </div>
   );
 }

@@ -2,6 +2,8 @@ import React, {useState} from "react";
 import {Button, Modal, Form, FloatingLabel} from "react-bootstrap"
 import Icon from '@mdi/react';
 import { mdiRename } from '@mdi/js';
+import toast from 'react-hot-toast';
+import config from '../config'
 
 function Name(props) {
 
@@ -11,15 +13,43 @@ function Name(props) {
 
     const handleClose = () => {
         setShow(false);
-        setNewName("")
+        setNewName("");
     }
 
     const handleShow = () => setShow(true);
 
-    const handleRename = () => {
-        setNewName("")
-        handleClose();   
-    }
+    const handleRename = async () => {
+
+        try {
+            const dToIn = {
+                id: props.id,
+                newName: newName,
+            };
+  
+            const response = await fetch(`${config.URI}/blinds/update`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dToIn),
+            });
+  
+            if (response.ok) {
+                props.fetchData();
+                toast.success("Úspěšně změněno");
+                handleClose();
+            } else {
+                handleClose()
+                throw new Error('Chyba při editaci jména');
+                
+            }
+        } catch (error) {
+            toast.error("Chyba při editaci jména");
+            handleClose()
+            console.error('Chyba při editaci jména', error);
+        }
+    };
+
 
     return(
         <div className="Name">
@@ -27,7 +57,7 @@ function Name(props) {
 
             <Modal show={show} onHide={handleClose} backdrop="static" centered >
                 <Modal.Header closeButton>
-                    <Modal.Title>Přejmenovat</Modal.Title>
+                    <Modal.Title>Přejmenovat: {props.name}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <br/>
@@ -36,12 +66,8 @@ function Name(props) {
                     </FloatingLabel>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Zrušit
-                    </Button>
-                    <Button variant="primary" onClick={handleRename} disabled={!newName.trim()}>
-                        Uložit
-                    </Button>
+                    <Button variant="secondary" onClick={handleClose}>Zrušit</Button>
+                    <Button variant="primary" onClick={handleRename} disabled={!newName.trim()}>Uložit</Button>
                 </Modal.Footer>
             </Modal>
         </div>
