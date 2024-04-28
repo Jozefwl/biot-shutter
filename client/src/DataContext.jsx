@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import config from './config'
 
 const DataContext = createContext();
 
@@ -9,7 +10,7 @@ export const DataProvider = ({ children }) => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch('http://localhost:4000/blinds/status?id=662cd4ebe7ca5f43b4e6e82a');
+      const response = await fetch(`${config.URI}/blinds/status?id=${config.blindsId}`);
       const responseData = await response.json();
       setData(responseData.dToOut);
       console.log(responseData.dToOut)
@@ -23,7 +24,7 @@ export const DataProvider = ({ children }) => {
     fetchData();
   }, []);
 
-  /* // Zpoždění funkce fetchData
+  /* // Nasimulování opoždění
     useEffect(() => {
     const fetchDataWithDelay = async () => {
       

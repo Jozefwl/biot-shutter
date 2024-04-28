@@ -39,13 +39,22 @@ router.post("/toggle", async(req, res) => {
 router.post("/update", async(req, res) => {
     const blindId = req.body.id;
     const updatedBlind = {
-        name: req.body.newName,
-        dayLightControls: req.body.dayLightControls,
-        manualTimeSettings: req.body.manualTimeSettings
+        name: req.body.newName
     };
 
+    if (req.body.dayLightControls !== undefined) {
+        updatedBlind.dayLightControls = req.body.dayLightControls;
+    }
+
+    if (req.body.manualTimeSettings !== undefined) {
+        updatedBlind.manualTimeSettings = req.body.manualTimeSettings;
+    }
+
     try {
-        if(updatedBlind.dayLightControls === updatedBlind.manualTimeSettings){
+        if(updatedBlind.dayLightControls === updatedBlind.manualTimeSettings && 
+            updatedBlind.dayLightControls !== undefined && 
+            updatedBlind.manualTimeSettings !== undefined) {
+
             res.status(422).json(
                 {
                     dToOut : {
@@ -54,7 +63,8 @@ router.post("/update", async(req, res) => {
                     }
                 }
             )
-        }
+        } 
+        
 
         await Blind.findByIdAndUpdate(blindId, updatedBlind)
         res.status(200).json(
