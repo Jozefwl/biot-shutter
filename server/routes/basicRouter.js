@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Blind = require("../models/blindsModel");
+const ScheduledEvent = require('../models/scheduledEventsModel');
 
 router.use(express.json());
 
@@ -84,7 +85,14 @@ router.get("/status", async(req, res) => {
 
     try{
         const blind = await Blind.findById(blindId)
-        res.status(200).json({ dToOut: blind });
+        const scheduledEvents = await ScheduledEvent.find({blindId: blindId })
+
+        res.status(200).json({
+            dToOut: {
+                blindStatus: blind,
+                scheduledEvents: scheduledEvents
+            }
+        });
     }
     catch(err){
         res.status(404).json(
