@@ -19,7 +19,13 @@ function App() {
         <>
           <Name name={data.blindStatus.name} id={data.blindStatus._id} fetchData={fetchData}/>
           <Control id={data.blindStatus._id} pos={data.blindStatus.motorPosition} fetchData={fetchData}/>
-          <Settings />
+          <Settings 
+            id={data.blindStatus._id} 
+            useDaylight={data.blindStatus.daylightSensor} 
+            useTimeSettings={data.blindStatus.manualTimeSettings} 
+            events={data.scheduledEvents}
+            fetchData={fetchData}
+          />
         </>
        ):(
         <Spinner animation="border" />

@@ -39,11 +39,15 @@ router.post("/toggle", async(req, res) => {
 router.post("/update", async(req, res) => {
     const blindId = req.body.id;
     const updatedBlind = {
-        name: req.body.newName
+
     };
 
-    if (req.body.dayLightControls !== undefined) {
-        updatedBlind.dayLightControls = req.body.dayLightControls;
+    if (req.body.newName !== undefined) {
+        updatedBlind.name = req.body.newName;
+    }
+
+    if (req.body.daylightSensor!== undefined) {
+        updatedBlind.daylightSensor = req.body.daylightSensor ;
     }
 
     if (req.body.manualTimeSettings !== undefined) {
@@ -51,11 +55,11 @@ router.post("/update", async(req, res) => {
     }
 
     try {
-        if(updatedBlind.dayLightControls === updatedBlind.manualTimeSettings && 
-            updatedBlind.dayLightControls !== undefined && 
-            updatedBlind.manualTimeSettings !== undefined) {
+        if (updatedBlind.daylightSensor !== undefined && 
+            updatedBlind.manualTimeSettings !== undefined &&
+            updatedBlind.daylightSensor && updatedBlind.manualTimeSettings) { 
 
-            res.status(422).json(
+            return res.status(422).json(
                 {
                     dToOut : {
                         error: 3,
