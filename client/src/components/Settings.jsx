@@ -1,4 +1,4 @@
-import React, {useState} from "react"
+import React from "react"
 import Switch from "react-switch"
 import TimeSettings from "./TimeSettings"
 import config from '../config'
@@ -62,7 +62,7 @@ function Settings(props) {
             Senzor denního světla <Switch onChange={() => handleChange("daylightSensor")} checked={useDaylight} /><br/>
             Automatický časovač <Switch onChange={() => handleChange("manualTimeSettings")} checked={useTimeSettings} /><br/>
             <br />
-            <TimeSettings />
+            <TimeSettings show={useTimeSettings} fetchData={props.fetchData} TimeSettings={props.events} blindId={props.id}/>
         </div>
     )
 }
