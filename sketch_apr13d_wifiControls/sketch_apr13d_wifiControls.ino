@@ -1,58 +1,65 @@
 #include <WiFi.h>
 #include <WebServer.h>
-#include <WiFiManager.h>  
+#include <WiFiManager.h>
 #include <AccelStepper.h>
-#include <DNSServer.h> 
-#include <ArduinoJson.h> 
+#include <DNSServer.h>
+#include <ArduinoJson.h>
 #include <PubSubClient.h>
 #include <HardwareSerial.h>
-
 
 HardwareSerial mySerial(1); // Use UART1 for reading (pins 9 (RX) and 10 (TX) by default on ESP32)
 
 const byte DNS_PORT = 53;
-IPAddress apIP(192, 168, 1, 1);  // Gateway address for the AP
-DNSServer dnsServer;             // Create a DNS Server instance
+IPAddress apIP(192, 168, 1, 1); // Gateway address for the AP
+DNSServer dnsServer;            // Create a DNS Server instance
 
 AccelStepper stepper(AccelStepper::FULL4WIRE, 7, 5, 6, 4);
 WebServer Server(80);
 WiFiClient espClient;
-PubSubClient client(espClient);  // Create a PubSubClient instance
+PubSubClient client(espClient); // Create a PubSubClient instance
 
 long totalSteps = 0;
 unsigned long lastSendTime = 0;
-const long sendInterval = 60000;  // Send data every 60 seconds
-unsigned long lastReadTime = 0;   // Last time UART data was read
-const long readInterval = 2000;   // Minimum time between reads
-int adcValue = 0; 
+const long sendInterval = 60000; // Send data every 60 seconds
+unsigned long lastReadTime = 0;  // Last time UART data was read
+const long readInterval = 2000;  // Minimum time between reads
+int adcValue = 0;
 
-void setup() {
+void setup()
+{
     Serial.begin(9600);
     mySerial.begin(115200, SERIAL_8N1, 9, 10); // Initialize mySerial to 9600 baud rate
 
     WiFiManager wifiManager;
-    stepper.setMaxSpeed(500);  // Lower speed
-    stepper.setAcceleration(100);  // Set acceleration to a lower value
 
-    wifiManager.setTimeout(180);  // Timeout for WiFi configuration portal
+    // Reset WiFiManager settings every time for debugging
+    // wifiManager.resetSettings();
 
-    if (!wifiManager.autoConnect("AutoConnectAP")) {
+    stepper.setMaxSpeed(500);     // Lower speed
+    stepper.setAcceleration(100); // Set acceleration to a lower value
+
+    wifiManager.setTimeout(180); // Timeout for WiFi configuration portal
+
+    if (!wifiManager.autoConnect("AutoConnectAP"))
+    {
         Serial.println("Failed to connect and hit timeout");
         ESP.restart();
         delay(1000);
     }
 
     WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
-    dnsServer.start(DNS_PORT, "*", apIP);  // Capture all DNS requests
+    dnsServer.start(DNS_PORT, "*", apIP); // Capture all DNS requests
 
     client.setServer(IPAddress(194, 182, 91, 65), 1883); // Set MQTT server IP and port
     client.setCallback(callback);
 
-// Define Server paths
-Server.on("/moveCW", HTTP_POST, []() {
+    // Define Server paths
+    Server.on("/moveCW", HTTP_POST, []()
+              {
     DynamicJsonDocument doc(1024);
     deserializeJson(doc, Server.arg("plain"));
     int steps = doc["steps"];
+    if(steps > 10000){steps = 10000;};  // Limit steps to 10k
     stepper.move(steps); // Move steps
     totalSteps += steps;
 
@@ -61,13 +68,14 @@ Server.on("/moveCW", HTTP_POST, []() {
     response["totalSteps"] = totalSteps;
     String responseStr;
     serializeJson(response, responseStr);
-    Server.send(200, "application/json", responseStr);
-});
+    Server.send(200, "application/json", responseStr); });
 
-Server.on("/moveCCW", HTTP_POST, []() {
+    Server.on("/moveCCW", HTTP_POST, []()
+              {
     DynamicJsonDocument doc(1024);
     deserializeJson(doc, Server.arg("plain"));
     int steps = doc["steps"];
+    if (steps > 10000){steps = 10000;};  // Limit steps to 10k
     stepper.move(-steps); // Move -steps
     totalSteps -= steps;
 
@@ -76,18 +84,18 @@ Server.on("/moveCCW", HTTP_POST, []() {
     response["totalSteps"] = totalSteps;
     String responseStr;
     serializeJson(response, responseStr);
-    Server.send(200, "application/json", responseStr);
-});
+    Server.send(200, "application/json", responseStr); });
 
-Server.on("/status", HTTP_GET, []() {
+    Server.on("/status", HTTP_GET, []()
+              {
     DynamicJsonDocument response(1024);
     response["totalSteps"] = totalSteps;
     String responseStr;
     serializeJson(response, responseStr);
-    Server.send(200, "application/json", responseStr);
-});
+    Server.send(200, "application/json", responseStr); });
 
-Server.on("/resetWiFi", HTTP_GET, [&wifiManager]() {
+    Server.on("/resetWiFi", HTTP_GET, [&wifiManager]()
+              {
     wifiManager.resetSettings();
 
     DynamicJsonDocument response(1024);
@@ -97,32 +105,122 @@ Server.on("/resetWiFi", HTTP_GET, [&wifiManager]() {
     Server.send(200, "application/json", responseStr);
 
     delay(1000);
-    ESP.restart();
-});
+    ESP.restart(); });
+
+    Server.on("/setToSteps", HTTP_POST, []()
+              {
+    DynamicJsonDocument doc(1024);
+    deserializeJson(doc, Server.arg("plain"));
+    int steps = doc["steps"];
+
+    DynamicJsonDocument response(1024);
+    String responseStr;
+
+    if (steps < 0) {
+        response["message"] = "Can't set to negative steps";
+        serializeJson(response, responseStr);
+        Server.send(403, "application/json", responseStr);
+        return;
+    }
+
+    if (steps > 1000000) {
+        response["message"] = "Step count too big";
+        serializeJson(response, responseStr);
+        Server.send(403, "application/json", responseStr);
+        return;
+    }
+
+    moveToSetSteps(steps);
+
+    response["message"] = "Moving to set steps";
+    response["requestedSteps"] = steps;
+    response["totalSteps"] = totalSteps;
+    serializeJson(response, responseStr);
+    Server.send(200, "application/json", responseStr); });
+
+    Server.begin();
+    Serial.println("HTTP Server started");
+
     Server.begin();
     Serial.println("HTTP Server started");
 }
 
-void callback(char* topic, byte* payload, unsigned int length) {
+void moveToSetSteps(int setToSteps)
+{
+    if (setToSteps < 0)
+    {
+        setToSteps = 0; // Prevent moving to a step below 0
+    }
+    int stepDifference = setToSteps - totalSteps;
+    stepper.move(stepDifference); // This will queue the steps to move
+    totalSteps += stepDifference; // Update totalSteps to reflect the move
+
+    // Optionally log to Serial for debugging
+    Serial.print("Moving to set steps: ");
+    Serial.println(setToSteps);
+    Serial.print("Step difference: ");
+    Serial.println(stepDifference);
+}
+
+void callback(char *topic, byte *payload, unsigned int length)
+{
     DynamicJsonDocument doc(1024);
     deserializeJson(doc, payload, length);
     int steps = doc["steps"];
-    if (steps > 0) {
+
+    if (strcmp(topic, "setToSteps") == 0)
+    { // setToSteps Topic
+        if (steps < 0)
+        {
+            Serial.println("Can't set to negative steps");
+            return;
+        }
+
+        if (steps > 1000000)
+        {
+            Serial.println("Step count too big");
+            return;
+        }
+
+        moveToSetSteps(steps);
+    }
+    else if (steps > 0)
+    {
+        if (steps > 1000000)
+        {
+            Serial.println("Step count too big");
+            return;
+        }
+
         stepper.move(steps); // Move steps
         totalSteps += steps;
-    } else if (steps < 0) {
+    }
+    else if (steps < 0)
+    {
+        if (totalSteps - steps < 0)
+        {
+            Serial.println("Can't move to negative steps");
+            return;
+        }
+
         stepper.move(-steps); // Move -steps
         totalSteps -= steps;
     }
 }
 
-void reconnect() {
-    while (!client.connected()) {
+void reconnect()
+{
+    while (!client.connected())
+    {
         Serial.print("Attempting MQTT connection...");
-        if (client.connect("ESP8266Client")) {
+        if (client.connect("ESP8266Client"))
+        {
             Serial.println("connected");
             client.subscribe("steps");
-        } else {
+            client.subscribe("setToSteps");
+        }
+        else
+        {
             Serial.print("failed, rc=");
             Serial.print(client.state());
             Serial.println(" try again in 5 seconds");
@@ -131,12 +229,14 @@ void reconnect() {
     }
 }
 
-void loop() {
+void loop()
+{
     dnsServer.processNextRequest();
     Server.handleClient();
     stepper.run(); // Process stepper actions
 
-    if (!stepper.isRunning()) {
+    if (!stepper.isRunning())
+    {
         // If the stepper has no more steps to perform, disable the motor outputs
         digitalWrite(7, LOW);
         digitalWrite(5, LOW);
@@ -144,32 +244,45 @@ void loop() {
         digitalWrite(4, LOW);
     }
 
-    if (!client.connected()) {
+    if (!client.connected())
+    {
         reconnect();
     }
     client.loop();
 
     // Check if it's time to send the status
     unsigned long currentMillis = millis();
-    if (currentMillis - lastSendTime >= sendInterval) {
+    if (currentMillis - lastSendTime >= sendInterval)
+    {
         // It's time to send the status
         lastSendTime = currentMillis;
 
         // Publish the total steps to the "CurrentSteps" topic
         client.publish("CurrentSteps", String(totalSteps).c_str());
 
-        if (mySerial.available()) {
+        // Call the callback function to read MQTT
+        byte *payload = (byte *)String(totalSteps).c_str();
+        callback("CurrentSteps", payload, String(totalSteps).length());
+
+        if (mySerial.available())
+        {
             String line = mySerial.readStringUntil('\r');
             adcValue = line.substring(line.indexOf(":") + 2).toInt(); // Input type "ADC Value: 1234"
 
             // Publish the ADC value to the MQTT topic "LightValue"
             client.publish("LightValue", String(adcValue).c_str());
 
+            // Call the callback function to read MQTT
+            payload = (byte *)String(adcValue).c_str();
+            callback("LightValue", payload, String(adcValue).length());
+
             // Print the ADC value and total steps to the serial
             Serial.println("LightValue: " + String(adcValue));
             Serial.println("CurrentSteps: " + String(totalSteps));
-        } else { 
-            Serial.println("mySerial is unavailable"); 
+        }
+        else
+        {
+            Serial.println("mySerial is unavailable");
         }
     }
 }
