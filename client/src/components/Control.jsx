@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Button, Modal, Form, Stack} from "react-bootstrap"
+import {Button, Modal, Form, Stack, Spinner} from "react-bootstrap"
 import Icon from '@mdi/react';
 import { mdiArrowDownThick, mdiArrowUpThick, mdiArrowUpDownBold, mdiWindowShutterOpen, mdiWindowShutter } from '@mdi/js';
 import config from '../config'
@@ -14,16 +14,27 @@ function Control(props) {
 
     const [show, setShow] = useState(false);
 
-    const handleClose = () => setShow(false);
+    const handleClose = () => {
+       setShow(false); 
+    }
     const handleShow = () => setShow(true);
 
     const [slider, setSlider] = useState(openPercentage)
+
+    const [loading, setLoading] = useState(false)
 
     const handleSlider = (e) => {
         setSlider(parseInt(e.target.value))
     }
 
     const handleToggle = async (percentage) => {
+
+        toast.loading("Probíhají akce...", {
+            duration: 3000}
+        )
+
+        setLoading(true)
+        handleClose();
 
         try {
             const dToIn = {
@@ -42,15 +53,15 @@ function Control(props) {
             if (response.ok) {
                 props.fetchData();
                 toast.success("Úspěšně změněno");
-                handleClose();
+                setLoading(false)
             } else {
-                handleClose()
+                setLoading(false)
                 throw new Error('Chyba při ovládání žaluzií');
                 
             }
         } catch (error) {
             toast.error("Chyba při ovládání žaluzií");
-            handleClose()
+            setLoading(false)
             console.error('Chyba při ovládání žaluzií', error);
         }
     }; 
@@ -59,16 +70,25 @@ function Control(props) {
         <div className="Control">
             {props.pos > closePosition ? (
                 <div>
-                    <Icon path={mdiWindowShutterOpen} size={6} color="gray"/> <h5>Vytáhnuté na {openPercentage}%</h5>
+                    {loading ? (<>
+                        <Icon path={mdiWindowShutterOpen} size={6} color="lightgray"/> <h5><Spinner animation="border" role="status"/></h5>
+                    </>):(<>
+                        <Icon path={mdiWindowShutterOpen} size={6} color="gray"/> <h5>Vytáhnuté na {openPercentage}%</h5>
+                    </>)}
                 </div>
                 ):(
                 <div>
-                    <Icon path={mdiWindowShutter} size={6} color="gray" /> <h5>Zatáhnuté</h5>
+                    {loading ? (<>
+                        <Icon path={mdiWindowShutter} size={6} color="lightgray" /> <h5><Spinner animation="border" role="status"/></h5>
+                    </>):(<>
+                        <Icon path={mdiWindowShutter} size={6} color="gray" /> <h5>Zatáhnuté</h5>
+                    </>)}
+                    
                 </div>
             )}
-            <Button className="ControlButtons" variant="outline-success" onClick={() => handleToggle(100)}><Icon path={mdiArrowUpThick} size={3} /></Button>
-            <Button className="ControlButtons" variant="outline-secondary" onClick={handleShow}><Icon path={mdiArrowUpDownBold} size={3} /></Button>
-            <Button className="ControlButtons" variant="outline-danger" onClick={() => handleToggle(0)}><Icon path={mdiArrowDownThick} size={3} /></Button>
+            <Button className="ControlButtons" variant="outline-success" disabled={loading} onClick={() => handleToggle(100)}><Icon path={mdiArrowUpThick} size={3} /></Button>
+            <Button className="ControlButtons" variant="outline-secondary" disabled={loading} onClick={handleShow}><Icon path={mdiArrowUpDownBold} size={3} /></Button>
+            <Button className="ControlButtons" variant="outline-danger" disabled={loading} onClick={() => handleToggle(0)}><Icon path={mdiArrowDownThick} size={3} /></Button>
 
             <Modal show={show} onHide={handleClose} backdrop="static" centered >
                 <Modal.Header closeButton>
