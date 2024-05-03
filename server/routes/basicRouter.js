@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Blind = require("../models/blindsModel");
 const ScheduledEvent = require('../models/scheduledEventsModel');
+const MqttHandler = require('../middleware/mqttHandler')
 
 router.use(express.json());
 
@@ -14,7 +15,10 @@ router.post("/toggle", async(req, res) => {
 
         await new Promise(resolve => setTimeout(resolve, 5000));
 
-        // TO-DO: add call to change motor position on the actual motor
+        // mqtt part
+
+        const mqttHandler = new MqttHandler()
+        mqttHandler.publish("percentFromBE", {percent: requiredPosition})
 
         res.status(200).json(
             {
