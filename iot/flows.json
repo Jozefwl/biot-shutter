@@ -1,0 +1,601 @@
+[
+    {
+        "id": "f6f2187d.f17ca8",
+        "type": "tab",
+        "label": "MQTT Test Flow",
+        "disabled": true,
+        "info": ""
+    },
+    {
+        "id": "2c65db49a50a75c2",
+        "type": "tab",
+        "label": "Flow for moving blinds",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "f162aaedcdf80276",
+        "type": "tab",
+        "label": "Light Sensor Check",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "48127397a76ca04e",
+        "type": "mqtt-broker",
+        "name": "Mosquitto container",
+        "broker": "mosquitto",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "6b629a288db93536",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "OPEN SHUTTER",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "setToSteps",
+        "payload": "{\"steps\":20000}",
+        "payloadType": "json",
+        "x": 140,
+        "y": 460,
+        "wires": [
+            [
+                "5e43d3f38aab7b42"
+            ]
+        ]
+    },
+    {
+        "id": "d01bd18a2a66f578",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "debug 1",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 420,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "5b4b36279ed1c62b",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "Steps Recieve",
+        "topic": "setToSteps",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "48127397a76ca04e",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 120,
+        "y": 300,
+        "wires": [
+            [
+                "d01bd18a2a66f578"
+            ]
+        ]
+    },
+    {
+        "id": "5e43d3f38aab7b42",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "Control of Current Steps",
+        "topic": "setToSteps",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "48127397a76ca04e",
+        "x": 450,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "8f2fa1cf58205fdd",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "CLOSE SHUTTER",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "setToSteps",
+        "payload": "{\"steps\":0}",
+        "payloadType": "json",
+        "x": 150,
+        "y": 660,
+        "wires": [
+            [
+                "5e43d3f38aab7b42"
+            ]
+        ]
+    },
+    {
+        "id": "1fa7578f127a6e07",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "DO NOT USE",
+        "info": "",
+        "x": 150,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "3f2dc46275ecb950",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "----------------------------------------------",
+        "info": "",
+        "x": 220,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "eb726265b62a689e",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "----------------------------------------------",
+        "info": "",
+        "x": 220,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "af9c98a68e63d66a",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "ACT LIKE THIS IS IN PRODUCTION",
+        "info": "",
+        "x": 230,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "7c88486ad89acd65",
+        "type": "function",
+        "z": "2c65db49a50a75c2",
+        "name": "function 1",
+        "func": "let percent = msg.payload.percent; // Extract the percent value from the incoming message payload\nconst maxSteps = 10000; // Blinds open in this state\n\n// Calculate the number of steps corresponding to the given percentage\nlet calculatedSteps = (percent / 100) * maxSteps;\n\n// Create a new message object to hold the result\nlet newMsg = {\n    payload: {\n        steps: calculatedSteps\n    },\n    topic: \"setToSteps\" // Setting the topic for the outgoing message\n};\n\nreturn newMsg; // Return the new message with the calculated steps\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 220,
+        "wires": [
+            [
+                "1ac7be4c5f5cc8c0"
+            ]
+        ]
+    },
+    {
+        "id": "9db1b9f9041c810b",
+        "type": "comment",
+        "z": "2c65db49a50a75c2",
+        "name": "maxSteps = 10k",
+        "info": "",
+        "x": 520,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "a92bd6af177dfa5b",
+        "type": "mqtt in",
+        "z": "2c65db49a50a75c2",
+        "name": "topic = percentFromBE",
+        "topic": "percentFromBE",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "48127397a76ca04e",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 160,
+        "y": 220,
+        "wires": [
+            [
+                "7c88486ad89acd65"
+            ]
+        ]
+    },
+    {
+        "id": "0601b49a88f8c9cd",
+        "type": "comment",
+        "z": "2c65db49a50a75c2",
+        "name": "Recieve from BE % of where to move",
+        "info": "",
+        "x": 190,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "081220800c57d783",
+        "type": "json",
+        "z": "2c65db49a50a75c2",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 370,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "05676f78a9359013",
+        "type": "mqtt out",
+        "z": "2c65db49a50a75c2",
+        "name": "Control of Current Steps",
+        "topic": "setToSteps",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "48127397a76ca04e",
+        "x": 950,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "1ac7be4c5f5cc8c0",
+        "type": "delay",
+        "z": "2c65db49a50a75c2",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "35",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 720,
+        "y": 220,
+        "wires": [
+            [
+                "05676f78a9359013"
+            ]
+        ]
+    },
+    {
+        "id": "78a6db19700acd67",
+        "type": "comment",
+        "z": "2c65db49a50a75c2",
+        "name": "Rate Limit",
+        "info": "",
+        "x": 720,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "5fff9c82ef686634",
+        "type": "mqtt in",
+        "z": "f162aaedcdf80276",
+        "name": "",
+        "topic": "CurrentSteps",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "48127397a76ca04e",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 90,
+        "y": 40,
+        "wires": [
+            [
+                "d963018b58eeaed9"
+            ]
+        ]
+    },
+    {
+        "id": "bc52e5db9e5094aa",
+        "type": "mqtt in",
+        "z": "f162aaedcdf80276",
+        "name": "",
+        "topic": "LightValue",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "48127397a76ca04e",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 80,
+        "y": 100,
+        "wires": [
+            [
+                "d963018b58eeaed9"
+            ]
+        ]
+    },
+    {
+        "id": "d963018b58eeaed9",
+        "type": "join",
+        "z": "f162aaedcdf80276",
+        "name": "Join Messages",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": true,
+        "timeout": "5",
+        "count": "2",
+        "reduceRight": true,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 270,
+        "y": 80,
+        "wires": [
+            [
+                "c5d270514c2e1283"
+            ]
+        ]
+    },
+    {
+        "id": "2c91bbdacb2a51ae",
+        "type": "http request",
+        "z": "f162aaedcdf80276",
+        "name": "Send to Backend",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://194.182.91.65:4000/blinds/lightSensor",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 270,
+        "y": 200,
+        "wires": [
+            [
+                "8eec917e0c0f8038",
+                "192c541687fc561b"
+            ]
+        ]
+    },
+    {
+        "id": "8eec917e0c0f8038",
+        "type": "switch",
+        "z": "f162aaedcdf80276",
+        "name": "Check daylightSensor",
+        "property": "payload.dToOut.daylightSensor",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 500,
+        "y": 240,
+        "wires": [
+            [
+                "d80a22305eb12562"
+            ]
+        ]
+    },
+    {
+        "id": "d80a22305eb12562",
+        "type": "function",
+        "z": "f162aaedcdf80276",
+        "name": "Control Blinds",
+        "func": "var lightLevel = msg.payload.dToOut.LightValue;\nvar currentSteps = msg.payload.dToOut.CurrentSteps;\n\nif (lightLevel > 50000 && currentSteps !== 10000) {\n    msg.payload = { \"steps\": 10000 };\n    msg.topic = \"setToSteps\";\n} else if (lightLevel < 10000 && currentSteps !== 0) {\n    msg.payload = { \"steps\": 0 };\n    msg.topic = \"setToSteps\";\n} else {\n    return null; // Do nothing if conditions are not met\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 240,
+        "wires": [
+            [
+                "35a8c8ed40499359",
+                "872258c9a5e82a47"
+            ]
+        ]
+    },
+    {
+        "id": "35a8c8ed40499359",
+        "type": "mqtt out",
+        "z": "f162aaedcdf80276",
+        "name": "",
+        "topic": "setToSteps",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "48127397a76ca04e",
+        "x": 910,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "192c541687fc561b",
+        "type": "debug",
+        "z": "f162aaedcdf80276",
+        "name": "debugMsg",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 470,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "c5d270514c2e1283",
+        "type": "change",
+        "z": "f162aaedcdf80276",
+        "name": "Hardcoded ID",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.id",
+                "pt": "msg",
+                "to": "66351b236ca9c24b6afd71e1",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 460,
+        "y": 80,
+        "wires": [
+            [
+                "3854b71acb1ff37d"
+            ]
+        ]
+    },
+    {
+        "id": "872258c9a5e82a47",
+        "type": "debug",
+        "z": "f162aaedcdf80276",
+        "name": "debugMsg",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 910,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "3854b71acb1ff37d",
+        "type": "delay",
+        "z": "f162aaedcdf80276",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "30",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "30",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 640,
+        "y": 80,
+        "wires": [
+            [
+                "2c91bbdacb2a51ae"
+            ]
+        ]
+    },
+    {
+        "id": "2aabb639068bdf1d",
+        "type": "comment",
+        "z": "f162aaedcdf80276",
+        "name": "Hardcoded ID, maybe endpoint for getting ID later?",
+        "info": "",
+        "x": 470,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "e52eaf8398c95ada",
+        "type": "comment",
+        "z": "f162aaedcdf80276",
+        "name": "Call BE for if daylight sensor is enabled",
+        "info": "",
+        "x": 210,
+        "y": 240,
+        "wires": []
+    }
+]
