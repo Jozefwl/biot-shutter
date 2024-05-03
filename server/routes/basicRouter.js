@@ -42,6 +42,69 @@ router.post("/toggle", async(req, res) => {
 
 });
 
+router.post("/lightSensor", async(req, res) => {
+    const id = req.body.id;
+    const LightValue = req.body.LightValue;
+    const CurrentSteps = req.body.CurrentSteps;
+
+    try {
+        const blind = await Blind.findById(id);
+        if (!blind) {
+            return res.status(404).json({
+                dToOut: {
+                    error: 404,
+                    msg: 'No blinds found'
+                }
+            });
+        }
+
+        res.status(200).json({
+            dToOut: {
+                "LightValue": LightValue,
+                "CurrentSteps": CurrentSteps,
+                "daylightSensor": blind.daylightSensor
+            }
+        });
+    } catch(err) {
+        res.status(500).json({
+            dToOut: {
+                error: 500,
+                msg: err
+            }
+        });
+    }
+});
+
+router.post("/create", async(req, res) => {
+    const newBlind = new Blind({
+        name: req.body.name,
+        location: req.body.location,
+        motorPosition: req.body.motorPosition,
+        daylightSensor: req.body.daylightSensor,
+        manualTimeSettings: req.body.manualTimeSettings,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+    });
+
+    try {
+        const savedBlind = await newBlind.save();
+        res.status(200).json({
+            dToOut: {
+                "code": 0,
+                "msg": "Blind successfully created!",
+                "blind": savedBlind
+            }
+        });
+    } catch(err) {
+        res.status(500).json({
+            dToOut: {
+                error: 500,
+                msg: err
+            }
+        });
+    }
+});
+
 router.post("/update", async(req, res) => {
     const blindId = req.body.id;
     const updatedBlind = {
