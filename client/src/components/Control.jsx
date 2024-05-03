@@ -7,11 +7,6 @@ import toast from 'react-hot-toast';
 
 function Control(props) {
 
-    const openPosition = config.openPosition
-    const closePosition = config.closePosition
-
-    const openPercentage = props.pos/openPosition*100
-
     const [show, setShow] = useState(false);
 
     const handleClose = () => {
@@ -19,7 +14,7 @@ function Control(props) {
     }
     const handleShow = () => setShow(true);
 
-    const [slider, setSlider] = useState(openPercentage)
+    const [slider, setSlider] = useState(props.pos)
 
     const [loading, setLoading] = useState(false)
 
@@ -68,12 +63,12 @@ function Control(props) {
 
     return(
         <div className="Control">
-            {props.pos > closePosition ? (
+            {props.pos <= 100 ? (
                 <div>
                     {loading ? (<>
                         <Icon path={mdiWindowShutterOpen} size={6} color="lightgray"/> <h5><Spinner animation="border" role="status"/></h5>
                     </>):(<>
-                        <Icon path={mdiWindowShutterOpen} size={6} color="gray"/> <h5>Vytáhnuté na {openPercentage}%</h5>
+                        <Icon path={mdiWindowShutterOpen} size={6} color="gray"/> <h5>Vytáhnuté na {props.open}%</h5>
                     </>)}
                 </div>
                 ):(
