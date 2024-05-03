@@ -53,7 +53,7 @@ function Name(props) {
 
     return(
         <div className="Name">
-            <p>{props.name} <Button variant="outline-secondary" onClick={handleShow}><Icon path={mdiRename} size={1.7} /></Button></p>
+            <p>{props.name} <Button variant="outline-secondary" onClick={handleShow}><Icon path={mdiRename} size={1.5} /></Button></p>
 
             <Modal show={show} onHide={handleClose} backdrop="static" centered >
                 <Modal.Header closeButton>
