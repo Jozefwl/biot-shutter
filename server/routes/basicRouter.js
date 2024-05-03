@@ -13,7 +13,7 @@ router.post("/toggle", async(req, res) => {
     try{
         await Blind.findByIdAndUpdate(id, {motorPosition: requiredPosition, updatedAt: Date.now()})
 
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        await new Promise(resolve => setTimeout(resolve, 50000));
 
         // mqtt part
 
