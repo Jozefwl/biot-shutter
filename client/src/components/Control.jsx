@@ -39,7 +39,7 @@ function Control(props) {
         try {
             const dToIn = {
                 id: props.id,
-                requiredPosition: percentage/100*openPosition,
+                requiredPosition: percentage,
             };
   
             const response = await fetch(`${config.URI}/blinds/toggle`, {
