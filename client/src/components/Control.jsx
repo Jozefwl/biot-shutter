@@ -68,7 +68,7 @@ function Control(props) {
                     {loading ? (<>
                         <Icon path={mdiWindowShutterOpen} size={6} color="lightgray"/> <h5><Spinner animation="border" role="status"/></h5>
                     </>):(<>
-                        <Icon path={mdiWindowShutterOpen} size={6} color="gray"/> <h5>Vytáhnuté na {props.open}%</h5>
+                        <Icon path={mdiWindowShutterOpen} size={6} color="gray"/> <h5>Vytáhnuté na {props.pos}%</h5>
                     </>)}
                 </div>
                 ):(

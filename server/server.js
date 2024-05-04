@@ -1,16 +1,44 @@
 require('dotenv').config();
 const express = require("express");
 const https = require('https');
+const fs = require('fs');
+const Blind = require("./models/blindsModel");
 
 const basicRouter = require("./routes/basicRouter");
 const scheduleRoutes = require("./routes/scheduleRouter");
 const connectDb = require("./middleware/dbConn")
 const mongoose = require("mongoose");
+const MqttHandler = require('./middleware/mqttHandler')
 
 const app = express();
 const port = 4000;
 
 connectDb()
+
+const mqttHandler = new MqttHandler()
+
+mqttHandler.client.on('connect', () => {
+    mqttHandler.client.subscribe('percentFromBE', (err) => {
+        if (err) {
+            console.error('Failed to subscribe to topic: percentFromBE');
+        }
+    });
+});
+
+mqttHandler.client.on('message', async (topic, message) => {
+    if (topic === 'percentFromBE') {
+        const messageObject = JSON.parse(message.toString());
+        const requiredPosition = messageObject.percent;
+        const id = '66351b236ca9c24b6afd71e1';
+
+        try {
+            await Blind.findByIdAndUpdate(id, {motorPosition: requiredPosition, updatedAt: Date.now()});
+            console.log(`Motor position successfully changed to ${requiredPosition}`);
+        } catch (err) {
+            console.error('Failed to update motor position:', err);
+        }
+    }
+});
 
 // Load SSL/TLS certificate and key
 const options = {
@@ -35,6 +63,17 @@ app.use("/schedule", scheduleRoutes);
 
 // basic paths
 app.use("/blinds", basicRouter);
+
+// -------------------------------------------
+// - Uncomment for DEVELOPMENT without HTTPS -
+// -------------------------------------------
+
+/*
+mongoose.connection.once('open', () =>{
+    console.log('MongoDb connected');
+    app.listen(port, () => {console.log(`Server is running at http://localhost:${port}`)});
+});
+*/
 
 mongoose.connection.once('open', () =>{
     console.log('MongoDb connected');
