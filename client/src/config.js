@@ -1,7 +1,7 @@
 const config = {
-    URI: 'http://localhost:4000',
-    blindsId: '662cd4ebe7ca5f43b4e6e82a',
-    openPosition: 1000,
+    URI: 'https://waldhauser.sk:4000',
+    blindsId: '66351b236ca9c24b6afd71e1',
+    openPosition: 10000,
     closePosition: 0
 
 }
