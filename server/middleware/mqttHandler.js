@@ -2,7 +2,12 @@ const mqtt = require('mqtt');
 
 class MqttHandler {
     constructor() {
-        this.client = mqtt.connect('mqtt://194.182.91.65:1883');
+        const options = {
+            username: process.env.MQTT_USERNAME,
+            password: process.env.MQTT_PASSWORD,
+        };
+
+        this.client = mqtt.connect(process.env.MQTT_IP, options);
 
         // Event listeners for connection status
         this.client.on('connect', () => {

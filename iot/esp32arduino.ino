@@ -6,6 +6,9 @@
 #include <ArduinoJson.h>
 #include <PubSubClient.h>
 #include <HardwareSerial.h>
+#include <Preferences.h>
+
+Preferences preferences; // Init preferences library
 
 HardwareSerial mySerial(1); // Use UART1 for reading (pins 9 (RX) and 10 (TX) by default on ESP32)
 
@@ -23,6 +26,9 @@ unsigned long lastSendTime = 0;
 const long sendInterval = 60000; // Send data every 60 seconds
 unsigned long lastReadTime = 0;  // Last time UART data was read
 const long readInterval = 2000;  // Minimum time between reads
+long lastSavedPosition = 0;
+unsigned long lastSaveTime = 0;
+const unsigned long saveInterval = 10000; // Save every 10 seconds
 int adcValue = 0;
 
 void setup()
@@ -34,9 +40,6 @@ void setup()
 
     // Reset WiFiManager settings every time for debugging
     // wifiManager.resetSettings();
-
-    stepper.setMaxSpeed(500);     // Lower speed
-    stepper.setAcceleration(100); // Set acceleration to a lower value
 
     wifiManager.setTimeout(180); // Timeout for WiFi configuration portal
 
@@ -52,6 +55,13 @@ void setup()
 
     client.setServer(IPAddress(194, 182, 91, 65), 1883); // Set MQTT server IP and port
     client.setCallback(callback);
+
+    // Init stepper last
+    stepper.setMaxSpeed(500);     // Lower speed
+    stepper.setAcceleration(100); // Set acceleration to a lower value
+    long lastPosition = readPosition(); // Read the last saved position
+    stepper.setCurrentPosition(lastPosition); // Make the stepper know which position it is in
+    totalSteps = lastPosition; // Set the total steps to the last position
 
     // Define Server paths
     Server.on("/moveCW", HTTP_POST, []()
@@ -162,6 +172,29 @@ void moveToSetSteps(int setToSteps)
     Serial.println(stepDifference);
 }
 
+void savePosition(long position) {
+    unsigned long currentMillis = millis();
+    if ((position != lastSavedPosition) && (currentMillis - lastSaveTime >= saveInterval)) {
+        preferences.begin("stepper", false);
+        preferences.putLong("position", position);
+        preferences.end();
+        lastSaveTime = currentMillis;
+        lastSavedPosition = position;
+        Serial.println("Position saved to flash");
+    }
+}
+
+
+long readPosition() {
+    preferences.begin("stepper", true); // Open preferences
+    long position = preferences.getLong("position", 0); // Get the motor position, default to 0 if not set
+    preferences.end(); // Close preferences
+    Serial.print("Read position: ");
+    Serial.println(position);
+    return position;
+}
+
+
 void callback(char *topic, byte *payload, unsigned int length)
 {
     DynamicJsonDocument doc(1024);
@@ -213,7 +246,7 @@ void reconnect()
     while (!client.connected())
     {
         Serial.print("Attempting MQTT connection...");
-        if (client.connect("ESP8266Client"))
+        if (client.connect("ESP8266Client", "usern", "pass")) // Remember to remove PASSWORD FROM HERE!!!
         {
             Serial.println("connected");
             client.subscribe("steps");
@@ -250,6 +283,9 @@ void loop()
     }
     client.loop();
 
+    // Call savePos function
+    savePosition(totalSteps);
+
     // Check if it's time to send the status
     unsigned long currentMillis = millis();
     if (currentMillis - lastSendTime >= sendInterval)
@@ -259,6 +295,7 @@ void loop()
 
         // Publish the total steps to the "CurrentSteps" topic
         client.publish("CurrentSteps", String(totalSteps).c_str());
+        
 
         // Call the callback function to read MQTT
         byte *payload = (byte *)String(totalSteps).c_str();
