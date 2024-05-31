@@ -46,3 +46,61 @@
       margin: 4px;
   }
 }
+
+.Register .Logo h1 {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: bold;
+  font-size: 8rem;
+  letter-spacing: -6px;
+
+}
+
+.Register .Logo p {
+  font-family: 'Oxanium', sans-serif;
+  font-weight: 400;
+  font-size: 30px;
+}
+
+.Register .Card {
+  display: flex;
+  justify-content: center; 
+  text-align: center; 
+  margin-top: 5rem
+}
+
+.Register {
+  font-family: 'Oxanium', sans-serif;
+}
+
+
+.Register #buttonDiv {
+  width: 100%; 
+  display: flex;
+  justify-content: center; /* center horizontally */
+  align-items: center; /* center vertically */
+}
+
+.Register .Card .Changer {
+  margin-top: 15px
+}
+
+.Register .Card h2 {
+  padding: 1.5rem 0; 
+  border-bottom: solid lightgray 1px;
+}
+
+@media screen and (max-width: 767px) {
+  .Register .Logo h1 {
+      font-size: 4rem;
+      letter-spacing: -2px;
+  }
+
+  .Register .Logo p {
+      font-size: 18px;
+  }
+
+  .Register div .card {
+      width: "10rem";
+      margin: 4px;
+  }
+}
