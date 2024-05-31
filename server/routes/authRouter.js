@@ -6,7 +6,7 @@ const ScheduledEvent = require('../models/scheduledEventsModel');
 const MqttHandler = require('../middleware/mqttHandler')
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const authenticate = require('./middlewares/authenticate');
+const authenticate = require('../middleware/authenticate');
 const mongoose = require('mongoose');
 
 // Function to get user IDs from emails
@@ -94,3 +94,4 @@ router.post('/register', async (req, res) => {
     }
 });
 
+module.exports = router
