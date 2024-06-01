@@ -5,7 +5,6 @@ const fs = require('fs');
 const Blind = require("./models/blindsModel");
 
 const basicRouter = require("./routes/basicRouter");
-const scheduleRoutes = require("./routes/scheduleRouter");
 const authRouter = require("./routes/authRouter");
 const connectDb = require("./middleware/dbConn")
 const mongoose = require("mongoose");
@@ -60,8 +59,6 @@ app.get("/info", (req, res) => {
     res.send("Working!")
 });
 
-// blinder schedule paths
-app.use("/schedule", scheduleRoutes);
 
 // basic paths
 app.use("/blinds", basicRouter);
