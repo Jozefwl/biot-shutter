@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const Blind = require("../models/blindsModel");
-const ScheduledEvent = require('../models/scheduledEventsModel');
 const MqttHandler = require('../middleware/mqttHandler')
 
 router.use(express.json());
@@ -117,26 +116,8 @@ router.post("/update", async(req, res) => {
         updatedBlind.daylightSensor = req.body.daylightSensor ;
     }
 
-    if (req.body.manualTimeSettings !== undefined) {
-        updatedBlind.manualTimeSettings = req.body.manualTimeSettings;
-    }
 
     try {
-        if (updatedBlind.daylightSensor !== undefined && 
-            updatedBlind.manualTimeSettings !== undefined &&
-            updatedBlind.daylightSensor && updatedBlind.manualTimeSettings) { 
-
-            return res.status(422).json(
-                {
-                    dToOut : {
-                        error: 3,
-                        msg: "Blinds can't be operated according to day light and have manual time settings at the same time!"
-                    }
-                }
-            )
-        } 
-        
-
         await Blind.findByIdAndUpdate(blindId, updatedBlind)
         res.status(200).json(
             {
@@ -166,12 +147,10 @@ router.get("/status", async(req, res) => {
 
     try{
         const blind = await Blind.findById(blindId)
-        const scheduledEvents = await ScheduledEvent.find({blindId: blindId })
 
         res.status(200).json({
             dToOut: {
-                blindStatus: blind,
-                scheduledEvents: scheduledEvents
+                blindStatus: blind
             }
         });
     }
