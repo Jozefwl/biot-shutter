@@ -36,6 +36,9 @@ void setup()
     Serial.begin(9600);
     mySerial.begin(115200, SERIAL_8N1, 9, 10); // Initialize mySerial to 9600 baud rate
 
+     
+    pinMode(buttonPin, INPUT_PULLUP); // Initialize button pin as input with pullup resistor
+
     WiFiManager wifiManager;
 
     // Reset WiFiManager settings every time for debugging
@@ -322,4 +325,24 @@ void loop()
             Serial.println("mySerial is unavailable");
         }
     }
+
+        // Check for button press
+    buttonState = digitalRead(buttonPin);
+    if (buttonState != lastButtonState) {
+        if (buttonState == LOW) { // Button pressed
+            if (blindsOpen) {
+                // Close blinds
+                moveToSetSteps(0); // 0 is the closed position
+                blindsOpen = false;
+                Serial.println("Blinds closed");
+            } else {
+                // Open blinds
+                moveToSetSteps(10000); // Open fully
+                blindsOpen = true;
+                Serial.println("Blinds opened");
+            }
+        }
+        delay(50); // Debounce delay
+    }
+    lastButtonState = buttonState;
 }
