@@ -1,7 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@200;300;400;500;600;700;800&display=swap');
 
 .App {
   text-align: center;
+  font-family: 'Oxanium', sans-serif;
 }
 
 .Header {
@@ -48,10 +50,10 @@
 }
 
 .Register .Logo h1 {
-  font-family: 'Chakra Petch', sans-serif;
+  font-family: "Bebas Neue", sans-serif;
   font-weight: bold;
   font-size: 8rem;
-  letter-spacing: -6px;
+  letter-spacing: 1px;
 
 }
 
@@ -104,3 +106,19 @@
       margin: 4px;
   }
 }
+
+.Settings p {
+  margin: 0;
+}
+
+.Settings h3 {
+  margin: 20px 0;
+}
+
+.Name h3 {
+  margin: auto;
+  cursor: pointer;
+  font-size: 35px;
+  padding: 10px 0;
+}
+

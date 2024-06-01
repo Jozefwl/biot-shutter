@@ -63,27 +63,37 @@ function Control(props) {
 
     return(
         <div className="Control">
-            {props.pos <= 100 ? (
+            {props.pos !== 0 ? (
                 <div>
                     {loading ? (<>
-                        <Icon path={mdiWindowShutterOpen} size={6} color="lightgray"/> <h5><Spinner animation="border" role="status"/></h5>
+                        <Icon path={mdiWindowShutter} size={6} color="lightgray"/> 
+                        <h5><Spinner animation="border" role="status"/></h5>
                     </>):(<>
-                        <Icon path={mdiWindowShutterOpen} size={6} color="gray"/> <h5>Vytáhnuté na {props.pos}%</h5>
+                        <Icon path={mdiWindowShutter} size={6} color="gray"/> 
+                        <h5>Stáhnuté na {props.pos}%</h5>
                     </>)}
                 </div>
                 ):(
                 <div>
                     {loading ? (<>
-                        <Icon path={mdiWindowShutter} size={6} color="lightgray" /> <h5><Spinner animation="border" role="status"/></h5>
+                        <Icon path={mdiWindowShutterOpen} size={6} color="lightgray" /> 
+                        <h5><Spinner animation="border" role="status"/></h5>
                     </>):(<>
-                        <Icon path={mdiWindowShutter} size={6} color="gray" /> <h5>Zatáhnuté</h5>
+                        <Icon path={mdiWindowShutterOpen} size={6} color="gray" /> 
+                        <h5>Vytáhnuté</h5>
                     </>)}
                     
                 </div>
             )}
-            <Button className="ControlButtons" variant="outline-success" disabled={loading} onClick={() => handleToggle(100)}><Icon path={mdiArrowUpThick} size={3} /></Button>
-            <Button className="ControlButtons" variant="outline-secondary" disabled={loading} onClick={handleShow}><Icon path={mdiArrowUpDownBold} size={3} /></Button>
-            <Button className="ControlButtons" variant="outline-danger" disabled={loading} onClick={() => handleToggle(0)}><Icon path={mdiArrowDownThick} size={3} /></Button>
+            <Button className="ControlButtons" variant="outline-success" disabled={loading} onClick={() => handleToggle(100)}>
+                <Icon path={mdiArrowDownThick} size={3} />
+            </Button>
+            <Button className="ControlButtons" variant="outline-secondary" disabled={loading} onClick={handleShow}>
+                <Icon path={mdiArrowUpDownBold} size={3} />
+            </Button>
+            <Button className="ControlButtons" variant="outline-danger" disabled={loading} onClick={() => handleToggle(0)}>
+                <Icon path={mdiArrowUpThick} size={3} />
+            </Button>
 
             <Modal show={show} onHide={handleClose} backdrop="static" centered >
                 <Modal.Header closeButton>

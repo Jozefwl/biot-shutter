@@ -24,9 +24,7 @@ function Home() {
             <Control id={data.blindStatus._id} pos={data.blindStatus.motorPosition} fetchData={fetchData}/>
             <Settings 
               id={data.blindStatus._id} 
-              useDaylight={data.blindStatus.daylightSensor} 
-              useTimeSettings={data.blindStatus.manualTimeSettings} 
-              events={data.scheduledEvents}
+              useDaylight={data.blindStatus.daylightSensor}
               fetchData={fetchData}
             />
             </Card.Body>
