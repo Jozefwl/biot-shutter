@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Button, Modal, Form, FloatingLabel} from "react-bootstrap"
+import {Button, Modal, Form, FloatingLabel, Stack} from "react-bootstrap"
 import Icon from '@mdi/react';
 import { mdiRename } from '@mdi/js';
 import toast from 'react-hot-toast';
@@ -53,8 +53,7 @@ function Name(props) {
 
     return(
         <div className="Name">
-            <p>{props.name} <Button variant="outline-secondary" onClick={handleShow}><Icon path={mdiRename} size={1.5} /></Button></p>
-
+            <h3 className="header-title" onClick={handleShow} >{props.name}</h3>
             <Modal show={show} onHide={handleClose} backdrop="static" centered >
                 <Modal.Header closeButton>
                     <Modal.Title>Přejmenovat: {props.name}</Modal.Title>

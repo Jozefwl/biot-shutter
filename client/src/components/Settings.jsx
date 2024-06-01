@@ -1,35 +1,19 @@
 import React from "react"
 import Switch from "react-switch"
-import TimeSettings from "./TimeSettings"
 import config from '../config'
 import toast from 'react-hot-toast';
+import {Stack} from 'react-bootstrap'
 
 function Settings(props) {
 
     const useDaylight = props.useDaylight
-    const useTimeSettings = props.useTimeSettings
   
     const handleChange = async (action) => {
 
       try {
           let dToIn = {
-            id: props.id
-          };
-
-          if (action === "daylightSensor") {
-            dToIn = {
-              ...dToIn,
-              daylightSensor: !useDaylight,
-              manualTimeSettings: useTimeSettings
-            }
-          }
-
-          if (action === "manualTimeSettings") {
-            dToIn = {
-              ...dToIn,
-              daylightSensor: useDaylight,
-              manualTimeSettings: !useTimeSettings
-            }
+            id: props.id,
+            daylightSensor: !useDaylight,
           }
 
           const response = await fetch(`${config.URI}/blinds/update`, {
@@ -57,12 +41,13 @@ function Settings(props) {
   
 
     return(
-        <div>
+        <div className="Settings">
             <h3>Nastavení</h3>
-            Senzor denního světla <Switch onChange={() => handleChange("daylightSensor")} checked={useDaylight} /><br/>
-            Automatický časovač <Switch onChange={() => handleChange("manualTimeSettings")} checked={useTimeSettings} /><br/>
-            <br />
-            <TimeSettings show={useTimeSettings} fetchData={props.fetchData} TimeSettings={props.events} blindId={props.id}/>
+            <Stack direction="horizontal" >
+                <p>Senzor denního světla </p>
+                <Switch onChange={() => handleChange("daylightSensor")} checked={useDaylight}  className=" ms-auto"/>
+                <br/>
+            </Stack>
         </div>
     )
 }

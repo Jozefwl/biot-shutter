@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card, Button, FloatingLabel, Form } from 'react-bootstrap'; 
 import toast, { Toaster } from 'react-hot-toast';
 import config from "../config";
@@ -37,14 +37,17 @@ function Register() {
                 body: JSON.stringify(dToIn),
             });
             if (response.status === 201) {
-                toast.success("Successfully registered");
+                toast.success("Úspěšně zaregistrován");
                 setView("login");
-            } else {
+            } else if (response.status === 401) {
+                toast.error("Špatné heslo");
+            }
+            
+            else {
                 console.log(response);
-                // Save token to local storage
                 localStorage.setItem('token', response.userToken);
-                localStorage.setItem('loginTime', new Date().toISOString()); // Save login time
-                toast.success("Successfully logged in");
+                localStorage.setItem('loginTime', new Date().toISOString()); 
+                toast.success("Úspěšně přihlášen");
                 // navigation to home
                 window.location.href = '/home';
             }
@@ -61,12 +64,12 @@ function Register() {
             <Toaster position="top-center" reverseOrder={false}/>
             <div className="Logo">
                 <h1>Blinds Control</h1>
-                <p>Nějakej slogan.</p>
+                <p>Chytřejší žaluzie pro chytřejší život.</p>
             </div>
             <div className="Card">
                 {view === "register" ? (
                     <Card style={{ width: "30rem" }}>
-                        <Card.Title as="h2">Sign Up</Card.Title>
+                        <Card.Title as="h2">Registrace</Card.Title>
                         {error && <Card.Text className="error-message">{error}</Card.Text>}
                        
                         
@@ -79,35 +82,35 @@ function Register() {
                                         onChange={(e) => setEmail(e.target.value)}
                                     />
                                 </FloatingLabel>
-                                <FloatingLabel label="Password">
+                                <FloatingLabel label="Heslo">
                                     <Form.Control
                                         type="password"
-                                        placeholder="Password"
+                                        placeholder="Heslo"
                                         style={{ margin: "20px 0" }}
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                     />
                                 </FloatingLabel>
-                                <FloatingLabel label="Confirm Password">
+                                <FloatingLabel label="Znovu heslo">
                                     <Form.Control
                                         type="password"
-                                        placeholder="Confirm Password"
+                                        placeholder="Znovu heslo"
                                         style={{ margin: "20px 0" }}
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
                                     />
                                 </FloatingLabel>
                                 <Button type="submit" style={{ marginTop: "15px" }} disabled={!password || !confirmPassword || password !== confirmPassword}>
-                                    {view === "login" ? "Log In" : "Sign Up"}
+                                    {view === "login" ? "Přihlásit se" : "Zaregistrovat"}
                                 </Button>
                             </Form>
                         
-                        <p className="Changer">Already a member? <a href="#!" onClick={changeView}>Login</a></p>
+                        <p className="Changer">Již vlastníš účet? <a href="#!" onClick={changeView}>Přihlásit se</a></p>
                     </Card>
 
                 ) : (
                     <Card style={{ width: "30rem" }}>
-                        <Card.Title as="h2">Login</Card.Title>
+                        <Card.Title as="h2">Přihlášení</Card.Title>
                         <Card.Text>
                             {error && <div className="error-message">{error}</div>}
 
@@ -120,22 +123,22 @@ function Register() {
                                             onChange={(e) => setEmail(e.target.value)}
                                         />
                                     </FloatingLabel>
-                                    <FloatingLabel label="Password">
+                                    <FloatingLabel label="Heslo">
                                         <Form.Control
                                             type="password"
-                                            placeholder="Password"
+                                            placeholder="Heslo"
                                             style={{ margin: "20px 0" }}
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                         />
                                     </FloatingLabel>
                                     <Button type="submit" style={{ marginTop: "15px" }}>
-                                        {view === "login" ? "Log In" : "Sign Up"}
+                                        {view === "login" ? "Přihlásit se" : "Zaregistrovat"}
                                     </Button>
                                 </Form>
                             
                         </Card.Text>
-                        <p className="Changer">Need an account? <a href="#!" onClick={changeView}>Sign up</a></p>
+                        <p className="Changer">Ještě nemáš účet? <a href="#!" onClick={changeView}>Zaregistrovat se</a></p>
                     </Card>
                 )}
             </div>
